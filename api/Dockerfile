@@ -1,18 +1,21 @@
-FROM python:3.11
+# ── Build stage ──────────────────────────────────────────────────────────────
+FROM dhi.io/python:3.11-alpine3.23-dev AS builder
 
 WORKDIR /app
 
-# Copy requirements first for better layer caching
 COPY requirements.txt .
+RUN pip install --no-cache-dir --target=/install -r requirements.txt
 
-# Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# ── Runtime stage ─────────────────────────────────────────────────────────────
+FROM dhi.io/python:3.11-alpine3.23
 
-# Copy application code
+WORKDIR /app
+
+COPY --from=builder /install /app/lib
 COPY app.py .
 
-# Expose port
+ENV PYTHONPATH=/app/lib
+
 EXPOSE 5000
 
-# Run the application
 CMD ["python", "app.py"]

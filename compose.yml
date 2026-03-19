@@ -1,15 +1,15 @@
 version: '3.8'
-
 services:
   db:
-    image: postgres:15
+    image: dhi.io/postgres:15-alpine3.22
     container_name: taskdb
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-taskuser}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-taskpass}
       POSTGRES_DB: ${POSTGRES_DB:-taskdb}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      # DHI postgres uses versioned data dir — mount parent, not the versioned subpath
+      - postgres_data:/var/lib/postgresql
     networks:
       - backend
     healthcheck:
@@ -19,13 +19,13 @@ services:
       retries: 5
 
   redis:
-    image: redis:7
+    image: dhi.io/redis:8-debian13
     container_name: taskcache
-    command: ["redis-server", "--protected-mode", "no"]
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:-changeme}"]
     networks:
       - backend
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-changeme}", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -43,6 +43,7 @@ services:
       POSTGRES_PORT: 5432
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-changeme}
     depends_on:
       db:
         condition: service_healthy
@@ -57,7 +58,7 @@ services:
       retries: 5
 
   nginx:
-    image: nginx:latest
+    image: dhi.io/nginx:1.29.6-alpine3.23
     container_name: taskproxy
     ports:
       - "80:80"

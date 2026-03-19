@@ -27,9 +27,11 @@ db = SQLAlchemy(app)
 # Redis configuration
 redis_host = os.getenv('REDIS_HOST', 'redis')
 redis_port = int(os.getenv('REDIS_PORT', 6379))
+redis_password = os.getenv('REDIS_PASSWORD', None)
 cache = redis.Redis(
     host=redis_host,
     port=redis_port,
+    password=redis_password,
     decode_responses=True,
     lib_name="",
     lib_version=""
