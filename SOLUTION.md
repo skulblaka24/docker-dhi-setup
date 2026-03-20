@@ -81,7 +81,7 @@ Had to change the location for the files as Alpine Python were not looking at th
 | CVEs in base | High (200+) | ~0 |
 
 ***Nota***:
-For the estimated CVEs, I scanned the images using Docker Scout ( e.g., $ docker scout cves python:3.11)
+For the estimated CVEs, I scanned the images using Docker Scout ( e.g., `docker scout cves python:3.11`)
 
 ---
 
@@ -121,7 +121,8 @@ cache = redis.Redis(
 | nginx | ~190 MB | ~11 MB | ~89% |
 | **Total** | **~1.88 GB** | **~464 MB** | **~88%** |
 
-> Run `docker images` after build to confirm exact sizes on your platform.
+***Nota***:
+Ran `docker images` after build to confirm the sizes.
 
 ---
 
