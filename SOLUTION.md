@@ -37,7 +37,7 @@ Accessible here: [Redis image list on dhi.io](https://hub.docker.com/hardened-im
 ![Alt text](assets/nginx.png)
 Accessible here: [Nginx image list on dhi.io](https://hub.docker.com/hardened-images/catalog/dhi/nginx/images?distributions=alpine+3.23)
 
-### Why Docker Hardened Images?
+### Why Docker Hardened Images? Instead of Chainguard images for example.
 
 - **Zero known CVEs** at publish time — Docker continuously patches and republishes.
 - **Distroless runtime** — no shell, no package manager, minimal binaries.
@@ -49,13 +49,13 @@ Accessible here: [Nginx image list on dhi.io](https://hub.docker.com/hardened-im
 ### Image variant notes
 
 - **Postgres / Nginx / Python**: Alpine variants chosen for smallest footprint.
-- **Redis**: DHI only offers Debian 13 for Redis — no Alpine variant exists. At ~32 MB it remains significantly smaller than the original `redis:7` (~130 MB). Redis was also bumped from 7 to 8, which is the only version available in DHI and is backwards compatible for caching use cases.
+- **Redis**: DHI only offers Debian 13 for Redis — no Alpine variant exists. At ~32 MB it remains significantly smaller than the original `redis:7` (~130 MB). Redis was also bumped from 7 to 8.
 
 ---
 
 ## Dockerfile Changes (API)
 
-Multi-stage build using Alpine:
+#### Multi-stage build using Alpine:
 
 ```
 Stage 1 (builder): dhi.io/python:3.11-alpine3.23-dev
@@ -66,13 +66,22 @@ Stage 2 (runtime): dhi.io/python:3.11-alpine3.23
   → PYTHONPATH=/app/lib set so Python finds packages
 ```
 
+***Nota***:
+Had to change the location for the files as Alpine Python were not looking at the right place on the previous structure.
+
+
+#### Concerns:
+
 | Concern | Before | After |
 |---------|--------|-------|
 | Base image | `python:3.11` (full Debian) | DHI distroless Python Alpine |
 | Shell in runtime | Yes | No |
 | pip in runtime | Yes | No |
 | Runs as root | Yes | No |
-| CVEs in base | High (50+) | ~0 |
+| CVEs in base | High (200+) | ~0 |
+
+***Nota***:
+For the estimated CVEs, I scanned the images using Docker Scout ( e.g., $ docker scout cves python:3.11)
 
 ---
 
@@ -82,10 +91,9 @@ Stage 2 (runtime): dhi.io/python:3.11-alpine3.23
 |--------|--------|
 | All image tags | Replaced with DHI equivalents from `dhi.io` |
 | Postgres volume mount | Changed from `/var/lib/postgresql/data` to `/var/lib/postgresql` — DHI uses a versioned subdir (`/var/lib/postgresql/15/data`) so the parent must be mounted |
-| Redis command | Added `--requirepass ${REDIS_PASSWORD:-changeme}` — DHI Redis defaults to `protected-mode yes`, which blocks inter-container traffic without a password |
+| Redis security | Added `--requirepass ${REDIS_PASSWORD:-changeme}` — DHI Redis defaults to `protected-mode yes`, which blocks inter-container traffic without a password |
 | Redis healthcheck | Added `-a ${REDIS_PASSWORD:-changeme}` to `redis-cli ping` so the healthcheck itself authenticates |
 | Redis password in API env | Added `REDIS_PASSWORD` env var so the Flask app can authenticate |
-| Nginx tag | Replaced unpinned `nginx:latest` with `dhi.io/nginx:1.29.6-alpine3.23` |
 
 ## app.py Changes
 
@@ -107,11 +115,11 @@ cache = redis.Redis(
 
 | Service | Before | After | Reduction |
 |---------|--------|-------|-----------|
-| API | ~1.0 GB | ~80 MB | ~92% |
-| postgres | ~560 MB | ~90 MB | ~84% |
-| redis | ~130 MB | ~32 MB | ~75% |
-| nginx | ~190 MB | ~20 MB | ~89% |
-| **Total** | **~1.88 GB** | **~222 MB** | **~88%** |
+| API | ~1.0 GB | ~106 MB | ~92% |
+| postgres | ~560 MB | ~289 MB | ~84% |
+| redis | ~130 MB | ~58 MB | ~75% |
+| nginx | ~190 MB | ~11 MB | ~89% |
+| **Total** | **~1.88 GB** | **~464 MB** | **~88%** |
 
 > Run `docker images` after build to confirm exact sizes on your platform.
 
