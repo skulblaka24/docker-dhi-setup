@@ -137,7 +137,7 @@ Ran `docker images` after build to confirm the sizes.
 
 ---
 
-## Suggested Further Improvements
+## Possible Security Improvements
 
 **Secrets management** — replace plaintext env var defaults with Docker secrets or a vault.
 
