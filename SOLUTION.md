@@ -16,21 +16,26 @@ I tried to use only non-root images, without shells or package managers, with th
 
 Python dev image:
 ![Alt text](assets/python-dev.png)
+Accessible here: [Python dev image list on dhi.io](https://hub.docker.com/hardened-images/catalog/dhi/python/images?search=3.11&distributions=alpine+3.23&variants=dev)
 
 Python runtime image:
 ![Alt text](assets/python-runtime.png)
+Accessible here: [Python runtime image list on dhi.io](https://hub.docker.com/hardened-images/catalog/dhi/python/images?search=3.11&distributions=alpine+3.23&variants=runtime)
 
 #### Postgres
 
 ![Alt text](assets/postgres.png)
+Accessible here: [Postgres image list on dhi.io](https://hub.docker.com/hardened-images/catalog/dhi/postgres/images?search=15)
 
 #### Redis
 
 ![Alt text](assets/redis.png)
+Accessible here: [Redis image list on dhi.io](https://hub.docker.com/hardened-images/catalog/dhi/redis/images?page=0)
 
 #### Nginx
 
 ![Alt text](assets/nginx.png)
+Accessible here: [Nginx image list on dhi.io](https://hub.docker.com/hardened-images/catalog/dhi/nginx/images?distributions=alpine+3.23)
 
 ### Why Docker Hardened Images?
 
