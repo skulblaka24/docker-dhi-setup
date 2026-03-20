@@ -12,7 +12,10 @@ All four images were pulled from `dhi.io`. Using my own Docker Cloud account as 
 | Proxy    | `nginx:latest` | `dhi.io/nginx:1.29.6-alpine3.23`              |
 
 <img src="assets/python-dev.png" width="400" alt="python-dev" />
+
 ![Alt text](assets/python-dev.png)
+
+
 ### Why Docker Hardened Images?
 
 - **Zero known CVEs** at publish time — Docker continuously patches and republishes.
