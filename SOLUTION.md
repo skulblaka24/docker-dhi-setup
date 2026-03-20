@@ -11,10 +11,26 @@ All four images were pulled from `dhi.io`. Using my own Docker Cloud account as 
 | Cache    | `redis:7`      | `dhi.io/redis:8-debian13`                     |
 | Proxy    | `nginx:latest` | `dhi.io/nginx:1.29.6-alpine3.23`              |
 
-<img src="assets/python-dev.png" width="400" alt="python-dev" />
+I tried to use only non-root images, without shells or package managers, with the minimal vuln as possible.
+#### Python
 
+Python dev image:
 ![Alt text](assets/python-dev.png)
 
+Python runtime image:
+![Alt text](assets/python-runtime.png)
+
+#### Postgres
+
+![Alt text](assets/postgres.png)
+
+#### Redis
+
+![Alt text](assets/redis.png)
+
+#### Nginx
+
+![Alt text](assets/nginx.png)
 
 ### Why Docker Hardened Images?
 
