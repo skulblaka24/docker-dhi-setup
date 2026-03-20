@@ -33,7 +33,7 @@ echo ""
 echo "Test 1: Health Check"
 response=$(curl -s -w "\n%{http_code}" ${BASE_URL}/health)
 http_code=$(echo "$response" | tail -n 1)
-body=$(echo "$response" | head -n -1)
+body=$(echo "$response" | sed '$d')
 
 if [ "$http_code" -eq 200 ]; then
     print_result 0 "Health check endpoint is accessible"
@@ -49,7 +49,7 @@ response=$(curl -s -w "\n%{http_code}" -X POST ${BASE_URL}/api/tasks \
     -H "Content-Type: application/json" \
     -d '{"title":"Test Task 1","description":"This is a test task"}')
 http_code=$(echo "$response" | tail -n 1)
-body=$(echo "$response" | head -n -1)
+body=$(echo "$response" | sed '$d')
 
 if [ "$http_code" -eq 201 ]; then
     print_result 0 "Task created successfully"
@@ -65,7 +65,7 @@ echo ""
 echo "Test 3: List All Tasks"
 response=$(curl -s -w "\n%{http_code}" ${BASE_URL}/api/tasks)
 http_code=$(echo "$response" | tail -n 1)
-body=$(echo "$response" | head -n -1)
+body=$(echo "$response" | sed '$d')
 
 if [ "$http_code" -eq 200 ]; then
     print_result 0 "Tasks listed successfully"
@@ -79,7 +79,7 @@ echo ""
 echo "Test 4: Get Specific Task"
 response=$(curl -s -w "\n%{http_code}" ${BASE_URL}/api/tasks/${task_id})
 http_code=$(echo "$response" | tail -n 1)
-body=$(echo "$response" | head -n -1)
+body=$(echo "$response" | sed '$d')
 
 if [ "$http_code" -eq 200 ]; then
     print_result 0 "Task retrieved successfully"
@@ -95,7 +95,7 @@ response=$(curl -s -w "\n%{http_code}" -X PUT ${BASE_URL}/api/tasks/${task_id} \
     -H "Content-Type: application/json" \
     -d '{"title":"Updated Task","completed":true}')
 http_code=$(echo "$response" | tail -n 1)
-body=$(echo "$response" | head -n -1)
+body=$(echo "$response" | sed '$d')
 
 if [ "$http_code" -eq 200 ]; then
     print_result 0 "Task updated successfully"
@@ -123,7 +123,7 @@ echo ""
 echo "Test 7: Delete Task"
 response=$(curl -s -w "\n%{http_code}" -X DELETE ${BASE_URL}/api/tasks/${task_id})
 http_code=$(echo "$response" | tail -n 1)
-body=$(echo "$response" | head -n -1)
+body=$(echo "$response" | sed '$d')
 
 if [ "$http_code" -eq 200 ]; then
     print_result 0 "Task deleted successfully"

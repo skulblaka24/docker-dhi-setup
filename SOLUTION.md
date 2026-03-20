@@ -114,7 +114,7 @@ cache = redis.Redis(
 
 ## Security Improvements Summary
 
-1. No shell in any runtime container → prevents interactive exploitation post-RCE.
+1. No shell in any runtime container → prevents interactive exploitation post-RCE (Remote Code Execution).
 2. No root processes across all four services → limits blast radius of any escape.
 3. No package managers at runtime → prevents in-container software installation.
 4. Redis password authentication enabled → removes unauthenticated access vector.
@@ -153,4 +153,4 @@ image: dhi.io/postgres:15-alpine3.22@sha256:<digest>
 
 **Resource limits** — add `deploy.resources.limits` to prevent resource exhaustion.
 
-**HTTPS / TLS termination** — add TLS via Let's Encrypt or Traefik.
+**HTTPS / TLS termination** — add TLS via Let's Encrypt or Traefik or in the app.
