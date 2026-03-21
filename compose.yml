@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-taskpass}
       POSTGRES_DB: ${POSTGRES_DB:-taskdb}
     volumes:
-      # DHI postgres uses versioned data dir — mount parent, not the versioned subpath
+      # DHI postgres does not use a versioned subpath like the normal image from the hub
       - postgres_data:/var/lib/postgresql
     networks:
       - backend
@@ -21,11 +21,13 @@ services:
   redis:
     image: dhi.io/redis:7-debian13
     container_name: taskcache
-    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:-changeme}"]
+    # Added the password authentication
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:-taskredis}"]
     networks:
       - backend
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-changeme}", "ping"]
+      # Changed the test to consider the password setup
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-taskredis}", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -34,6 +36,7 @@ services:
     build:
       context: ./api
       dockerfile: Dockerfile
+    # Added the name for the image
     image: dhi-taskapi:latest
     container_name: taskapi
     environment:
@@ -44,7 +47,7 @@ services:
       POSTGRES_PORT: 5432
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-changeme}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-taskredis}
     depends_on:
       db:
         condition: service_healthy
