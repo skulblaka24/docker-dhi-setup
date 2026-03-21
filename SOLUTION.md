@@ -49,7 +49,7 @@ Accessible here: [Nginx image list on dhi.io](https://hub.docker.com/hardened-im
 ### Image variant notes
 
 - **Postgres / Nginx / Python**: Alpine variants chosen for smallest footprint.
-- **Redis**: DHI only offers Debian 13 for Redis — no Alpine variant exists. At ~63 MB it remains significantly smaller than the original `redis:7` (~130 MB).
+- **Redis**: DHI only offers Debian 13 for Redis — no Alpine variant exists. At ~64 MB it remains significantly smaller than the original `redis:7` (~117 MB).
 
 ---
 
@@ -115,11 +115,11 @@ cache = redis.Redis(
 
 | Service | Before | After | Reduction |
 |---------|--------|-------|-----------|
-| API | ~1.0 GB | ~106 MB | ~92% |
-| postgres | ~560 MB | ~289 MB | ~84% |
-| redis | ~130 MB | ~64 MB | ~75% |
-| nginx | ~190 MB | ~11 MB | ~89% |
-| **Total** | **~1.88 GB** | **~464 MB** | **~88%** |
+| API | ~1.15 GB | ~106 MB | ~91% |
+| postgres | ~445 MB | ~289 MB | ~35% |
+| redis | ~117 MB | ~64 MB | ~45% |
+| nginx | ~161 MB | ~11 MB | ~93% |
+| **Total** | **~1.87 GB** | **~470 MB** | **~75%** |
 
 ***Nota***:
 Ran `docker images` after build to confirm the sizes.
