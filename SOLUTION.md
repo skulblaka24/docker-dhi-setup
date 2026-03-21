@@ -1,5 +1,9 @@
 # Docker Hardening Migration
 
+## App Architecture
+
+![Alt text](assets/app_architecture.svg)
+
 ## Image Choices
 
 All four images were pulled from `dhi.io`. Using my own Docker Cloud account as it is free.
