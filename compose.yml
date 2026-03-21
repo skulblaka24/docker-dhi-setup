@@ -34,7 +34,7 @@ services:
     build:
       context: ./api
       dockerfile: Dockerfile
-    image: taskapi:latest
+    image: dhi-taskapi:latest
     container_name: taskapi
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-taskuser}
