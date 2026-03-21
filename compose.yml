@@ -19,7 +19,7 @@ services:
       retries: 5
 
   redis:
-    image: dhi.io/redis:8-debian13
+    image: dhi.io/redis:7-debian13
     container_name: taskcache
     command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:-changeme}"]
     networks:

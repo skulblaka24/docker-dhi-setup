@@ -8,7 +8,7 @@ All four images were pulled from `dhi.io`. Using my own Docker Cloud account as 
 | -------- | -------------- | --------------------------------------------- |
 | API      | `python:3.11`  | `dhi.io/python:3.11-alpine3.23` (multi-stage) |
 | Database | `postgres:15`  | `dhi.io/postgres:15-alpine3.22`               |
-| Cache    | `redis:7`      | `dhi.io/redis:8-debian13`                     |
+| Cache    | `redis:7`      | `dhi.io/redis:7-debian13`                     |
 | Proxy    | `nginx:latest` | `dhi.io/nginx:1.29.6-alpine3.23`              |
 
 I tried to use only non-root images, without shells or package managers, with the minimal vuln as possible.
@@ -49,7 +49,7 @@ Accessible here: [Nginx image list on dhi.io](https://hub.docker.com/hardened-im
 ### Image variant notes
 
 - **Postgres / Nginx / Python**: Alpine variants chosen for smallest footprint.
-- **Redis**: DHI only offers Debian 13 for Redis — no Alpine variant exists. At ~32 MB it remains significantly smaller than the original `redis:7` (~130 MB). Redis was also bumped from 7 to 8.
+- **Redis**: DHI only offers Debian 13 for Redis — no Alpine variant exists. At ~63 MB it remains significantly smaller than the original `redis:7` (~130 MB).
 
 ---
 
@@ -117,7 +117,7 @@ cache = redis.Redis(
 |---------|--------|-------|-----------|
 | API | ~1.0 GB | ~106 MB | ~92% |
 | postgres | ~560 MB | ~289 MB | ~84% |
-| redis | ~130 MB | ~58 MB | ~75% |
+| redis | ~130 MB | ~64 MB | ~75% |
 | nginx | ~190 MB | ~11 MB | ~89% |
 | **Total** | **~1.88 GB** | **~464 MB** | **~88%** |
 
