@@ -168,8 +168,6 @@ services:
     read_only: true
     tmpfs:
       - /tmp
-      - /var/run/nginx         # nginx PID file
-      - /var/cache/nginx       # proxy/fastcgi cache
     security_opt:
       - no-new-privileges:true
     cap_drop:
