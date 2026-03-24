@@ -159,7 +159,7 @@ services:
       - frontend
       - backend
     healthcheck:
-      test: ["CMD-SHELL", "kill -0 $(cat /var/run/nginx/nginx.pid) || exit 1"]
+      test: ["CMD-SHELL", "kill -0 $(cat /tmp/nginx.pid) || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
