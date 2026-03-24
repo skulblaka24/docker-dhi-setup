@@ -16,7 +16,6 @@ All four images were pulled from `dhi.io`. Using my own Docker Cloud account as 
 | Proxy    | `nginx:latest` | `dhi.io/nginx:1.29.6-alpine3.23`              |
 
 I tried to use only non-root images, without shells or package managers, with the minimal vuln as possible.
-
 #### Python
 
 Python dev image:
@@ -65,16 +64,15 @@ Accessible here: [Nginx image list on dhi.io](https://hub.docker.com/hardened-im
 ```
 Stage 1 (builder): dhi.io/python:3.11-alpine3.23-dev
   → has pip; installs deps into /install with --target
-  → requirements.txt copied first for better layer caching
 
 Stage 2 (runtime): dhi.io/python:3.11-alpine3.23
   → distroless; receives /app/lib and app.py only
   → PYTHONPATH=/app/lib set so Python finds packages
-  → no USER directive needed — DHI runs as non-root by default
 ```
 
 ***Nota***:
-Had to use `--target` instead of `--prefix` and copy packages to `/app/lib` with `PYTHONPATH` set accordingly, as Alpine Python was not looking at the right place with the previous structure.
+Had to change the location for the files as Alpine Python were not looking at the right place on the previous structure.
+
 
 #### Concerns:
 
@@ -87,7 +85,7 @@ Had to use `--target` instead of `--prefix` and copy packages to `/app/lib` with
 | CVEs in base | High (200+) | ~0 |
 
 ***Nota***:
-For the estimated CVEs, I scanned the images using Docker Scout (e.g., `docker scout cves python:3.11`)
+For the estimated CVEs, I scanned the images using Docker Scout ( e.g., `docker scout cves python:3.11`)
 
 ---
 
@@ -95,18 +93,11 @@ For the estimated CVEs, I scanned the images using Docker Scout (e.g., `docker s
 
 | Change | Detail |
 |--------|--------|
-| All image tags | Replaced with DHI equivalents from `dhi.io`, pinned by digest for reproducibility |
-| Network segmentation | Split into `frontend` (nginx↔host) and `backend` (api↔db↔redis, internal only) |
+| All image tags | Replaced with DHI equivalents from `dhi.io` |
 | Postgres volume mount | Changed from `/var/lib/postgresql/data` to `/var/lib/postgresql` — DHI uses a versioned subdir (`/var/lib/postgresql/15/data`) so the parent must be mounted |
-| Redis security | Added `--requirepass ${REDIS_PASSWORD:-redispass}` — DHI Redis defaults to `protected-mode yes`, which blocks inter-container traffic without a password |
-| Redis healthcheck | Added `-a ${REDIS_PASSWORD:-redispass}` to `redis-cli ping` so the healthcheck itself authenticates |
+| Redis security | Added `--requirepass ${REDIS_PASSWORD:-changeme}` — DHI Redis defaults to `protected-mode yes`, which blocks inter-container traffic without a password |
+| Redis healthcheck | Added `-a ${REDIS_PASSWORD:-changeme}` to `redis-cli ping` so the healthcheck itself authenticates |
 | Redis password in API env | Added `REDIS_PASSWORD` env var so the Flask app can authenticate |
-| Read-only filesystems | All services use `read_only: true` with `tmpfs` for directories needing writes |
-| Capabilities | `cap_drop: ALL` on all services; only specific caps re-added where strictly needed (`SETUID`/`SETGID`/`DAC_OVERRIDE` for postgres init, `NET_BIND_SERVICE` for nginx port 80) |
-| No new privileges | `no-new-privileges:true` set on all services |
-| Resource limits | CPU and memory limits defined for all services via `deploy.resources` |
-| Health check tuning | Added `start_period` to all healthchecks to avoid false failures during init |
-| API image name | Added `image: dhi-taskapi:latest` so the built image is named and tagged |
 
 ## app.py Changes
 
@@ -147,15 +138,37 @@ Ran `docker images` after build to confirm the sizes.
 4. Redis password authentication enabled → removes unauthenticated access vector.
 5. Signed SBOMs + SLSA L3 provenance → full supply-chain auditability.
 6. Unpinned `nginx:latest` eliminated → deterministic, security-patched builds.
-7. All images pinned by digest → fully reproducible builds, immune to tag mutation.
-8. Read-only filesystems on all containers → prevents runtime filesystem tampering.
-9. All Linux capabilities dropped → minimal privilege surface per container.
-10. Network segmentation → backend services unreachable from the host directly.
 
 ---
 
 ## Possible Security Improvements
 
 **Secrets management** — replace plaintext env var defaults with Docker secrets or a vault.
+
+**Read-only filesystems:**
+```yaml
+services:
+  api:
+    read_only: true
+    tmpfs:
+      - /tmp
+```
+
+**Drop Linux capabilities:**
+```yaml
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+```
+
+**Network segmentation** — separate `frontend` network for nginx↔host, keeping `backend` internal for api↔db↔redis.
+
+**Image pinning by digest** for fully reproducible builds:
+```yaml
+image: dhi.io/postgres:15-alpine3.22@sha256:<digest>
+```
+
+**Resource limits** — add `deploy.resources.limits` to prevent resource exhaustion.
 
 **HTTPS / TLS termination** — add TLS via Let's Encrypt or Traefik or in the app.
