@@ -184,8 +184,8 @@ Vault (external, http://local.vault.starfly.fr:8200)
  
 Two templates are rendered on startup and re-rendered every 5 minutes if secrets change:
  
-- **`.env`** — contains `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`, `REDIS_PASSWORD`; sourced into the shell before `docker compose up` so compose can interpolate `${VAR}` normally
-- **`redis.conf`** — contains `requirepass <password>` baked in directly; mounted into the redis container at `/etc/redis/redis.conf` to avoid compose variable interpolation issues with the `command` block
+- **`.env`**: contains `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`, `REDIS_PASSWORD`; sourced into the shell before `docker compose up` so compose can interpolate `${VAR}` normally
+- **`redis.conf`**: contains `requirepass <password>` baked in directly; mounted into the redis container at `/etc/redis/redis.conf` to avoid compose variable interpolation issues with the `command` block
  
 ### Startup Sequence
  
@@ -230,8 +230,8 @@ http {
  
 ## Possible Security Improvements
  
-**Dynamic PostgreSQL secrets** — use Vault's database secrets engine to issue short-lived, auto-revoked PostgreSQL credentials per application instance instead of static KV credentials.
+**Dynamic PostgreSQL secrets**: use Vault's database secrets engine to issue short-lived, auto-revoked PostgreSQL credentials per application instance instead of static KV credentials.
 
-**AppRole authentication** — replace token-based Vault Agent auth with AppRole for better secret-zero handling in production environments.
+**AppRole authentication**: replace token-based Vault Agent auth with AppRole for better secret-zero handling in production environments.
  
-**HTTPS / TLS termination** — add TLS via Let's Encrypt or Traefik or in the app.
+**HTTPS / TLS termination**: add TLS via Let's Encrypt or Traefik or in the app.
