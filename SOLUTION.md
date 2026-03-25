@@ -95,11 +95,11 @@ For the estimated CVEs, I scanned the images using Docker Scout (e.g., `docker s
  
 | Change | Detail |
 |--------|--------|
-| All image tags | Replaced with DHI equivalents from `dhi.io`, pinned by digest for reproducibility |
-| Network segmentation | `frontend` network (nginx↔host) and internal `backend` network (api↔db↔redis) — temporarily removed during Vault database engine setup, then restored |
+| All image tags | Replaced with DHI equivalents from `dhi.io`, pinned by digest |
+| Network segmentation | `frontend` network (nginx↔host) and internal `backend` network (api↔db↔redis) |
 | Postgres volume mount | Changed from `/var/lib/postgresql/data` to `/var/lib/postgresql` — DHI uses a versioned subdir (`/var/lib/postgresql/15/data`) so the parent must be mounted |
 | Redis security | Redis started via `redis-server /etc/redis/redis.conf` with password injected by Vault Agent into a rendered `redis.conf` |
-| Redis healthcheck | Added `-a ${REDIS_PASSWORD}` to `redis-cli ping` so the healthcheck itself authenticates |
+| Redis healthcheck | Added `-a $$REDIS_PASSWORD` to `redis-cli ping` so the healthcheck itself authenticates |
 | Secrets management | All credentials sourced from Vault Agent rendered files in `/tmp/vault-env/` — never stored on disk or in the repository |
 | Read-only filesystems | All services use `read_only: true` with `tmpfs` for directories needing writes |
 | Capabilities | `cap_drop: ALL` on all services; only specific caps re-added where strictly needed (`SETUID`/`SETGID`/`DAC_OVERRIDE` for postgres init, `NET_BIND_SERVICE` for nginx port 80) |
@@ -110,7 +110,7 @@ For the estimated CVEs, I scanned the images using Docker Scout (e.g., `docker s
  
 ## app.py Changes
  
-Added `REDIS_PASSWORD` env var reading and passed it to the Redis client constructor:
+Added `REDIS_PASSWORD` env var reading:
  
 ```python
 redis_password = os.getenv('REDIS_PASSWORD', None)
@@ -147,7 +147,7 @@ Ran `docker images` after build to confirm the sizes.
 4. Redis password authentication enabled → removes unauthenticated access vector.
 5. Signed SBOMs + SLSA L3 provenance → full supply-chain auditability.
 6. Unpinned `nginx:latest` eliminated → deterministic, security-patched builds.
-7. All images pinned by digest → fully reproducible builds, immune to tag mutation.
+7. All images pinned by digest → fully reproducible builds.
 8. Read-only filesystems on all containers → prevents runtime filesystem tampering.
 9. All Linux capabilities dropped → minimal privilege surface per container.
 10. Network segmentation → backend services unreachable from the host directly.
@@ -173,7 +173,7 @@ Vault (external, http://local.vault.starfly.fr:8200)
         └─ /tmp/vault-env/redis.conf → mounted into redis container (requirepass <password>)
 ```
  
-### Vault KV Secret Paths
+### Vault KVv2 Secret Paths
  
 | Path | Keys |
 |------|------|
@@ -197,21 +197,13 @@ echo $VAULT_TOKEN > /tmp/vault-agent-token && chmod 600 /tmp/vault-agent-token
 mkdir -p /tmp/vault-env
 vault agent -config=vault-agent.hcl &
  
-# 3. Wait for secrets to be rendered
-until [ -s /tmp/vault-env/.env ] && [ -s /tmp/vault-env/redis.conf ]; do
-  sleep 1
-done
- 
-# 4. Source .env into shell for compose variable interpolation
-set -a && source /tmp/vault-env/.env && set +a
- 
-# 5. Start containers
+# 3. Start containers
 docker compose up -d
 ```
  
 ### Why /tmp on macOS
  
-On macOS, `/tmp` is backed by an APFS in-memory volume — it is never written to a spinning disk or SSD and is cleared on reboot. Docker Desktop shares `/tmp` with its Linux VM by default, making it usable as both a Vault Agent render destination and a compose `env_file` source without any additional configuration.
+On macOS, `/tmp` is backed by an APFS in-memory volume and is cleared on reboot. Docker Desktop shares `/tmp` with its Linux VM by default, making it usable as both a Vault Agent render destination and a compose `env_file` source without any additional configuration.
  
 ***Nota***:
 `env_file` values are injected into container environments at start time only — they are not watched for changes at runtime. If Vault Agent re-renders `/tmp/vault-env/.env` due to a secret rotation, the affected containers (`db`, `redis`) must be restarted to pick up the new values. This is expected behaviour: both postgres and redis require a restart to apply credential changes regardless of how they are delivered.
