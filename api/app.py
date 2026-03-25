@@ -13,11 +13,11 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 # Database configuration
-db_user = os.getenv('POSTGRES_USER', 'taskuser')
-db_password = os.getenv('POSTGRES_PASSWORD', 'taskpass')
+db_user = os.getenv('POSTGRES_USER', None)
+db_password = os.getenv('POSTGRES_PASSWORD', None)
 db_host = os.getenv('POSTGRES_HOST', 'db')
 db_port = os.getenv('POSTGRES_PORT', '5432')
-db_name = os.getenv('POSTGRES_DB', 'taskdb')
+db_name = os.getenv('POSTGRES_DB', None)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
