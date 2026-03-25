@@ -21,7 +21,7 @@
        DOCKER NETWORK (left/center column)
   ══════════════════════════════════════════════ -->
   <rect x="40" y="108" width="480" height="412" rx="16" fill="none" stroke-width="0.5" stroke-dasharray="6 4" style="stroke:rgba(222,220,209,0.3)"/>
-  <text x="56" y="128" style="fill:rgb(156,154,146);font-family:&quot;Anthropic Sans&quot;,-apple-system,sans-serif;font-size:12px">backend network (Docker)</text>
+  <text x="56" y="128" style="fill:rgb(156,154,146);font-family:&quot;Anthropic Sans&quot;,-apple-system,sans-serif;font-size:12px">network (Docker)</text>
 
   <!-- Nginx -->
   <g style="font-family:&quot;Anthropic Sans&quot;,-apple-system,sans-serif">
