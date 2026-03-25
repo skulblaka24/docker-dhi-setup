@@ -230,8 +230,8 @@ http {
  
 ## Possible Security Improvements
  
-**Dynamic PostgreSQL secrets** — use Vault's database secrets engine to issue short-lived, auto-revoked PostgreSQL credentials per application instance instead of static KV credentials. `vault-setup.sh` and `hvac==2.4.0` in `requirements.txt` are already prepared for this.
- 
+**Dynamic PostgreSQL secrets** — use Vault's database secrets engine to issue short-lived, auto-revoked PostgreSQL credentials per application instance instead of static KV credentials.
+
 **AppRole authentication** — replace token-based Vault Agent auth with AppRole for better secret-zero handling in production environments.
  
 **HTTPS / TLS termination** — add TLS via Let's Encrypt or Traefik or in the app.
